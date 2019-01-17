@@ -1,54 +1,49 @@
-############################################################
-##this code illustrates how to do analyze a simple model
-#it runs the simple bacterial infection model for a range of parameters
-#for each parameter outcomes are reported
-##the resulting plots are x-y plots with a parameter of interested varied
-#and the change in outcome plotted
-##written by Andreas Handel (ahandel@uga.edu), last change 1/16/18
-############################################################
-
-#' Simulation to illustrate a simple use of a simple model
-#'
-#'
-#' @description This function simulates the simple bacteria model for a range of parameters.
+#' Simulation to illustrate parameter scan of the basic bacteria model
+#'#'
+#' @description This function simulates the simple bacteria model ODE for a range of parameters.
 #' The function returns a data frame containing the parameter that has been varied and the outcomes (see details).
 #'
-#' @param B0 initial number of bacteria
-#' @param I0 initial number/strength of immune response
-#' @param g rate of bacteria growth
-#' @param Bmax carrying capacity for bacteria
-#' @param dB death rate of bacteria
-#' @param k rate at which bacteria are killed by immune response
-#' @param r rate at which immune response is induced by bacteria
-#' @param dI death rate of immune response
-#' @param samplepar name of parameter to be varied
-#' @param pmin lower value for varied parameter
-#' @param pmax upper value for varied parameter
-#' @param samples number of values to run between pmin and pmax
-#' @param pardist spacing of parameter values, can be either 'lin' or 'log'
-#' @param tmax maximum simulation time, units depend on choice of units for your
-#'   parameters
+#' @param B : Starting value for bacteria : numeric
+#' @param I : Starting value for immune response : numeric
+#' @param g : Maximum rate of bacteria growth : numeric
+#' @param Bmax : Bacteria carrying capacity : numeric
+#' @param dB : Bacteria death rate : numeric
+#' @param k : Bacteria kill rate : numeric
+#' @param r : Immune response growth rate : numeric
+#' @param dI : Immune response decay rate : numeric
+#' @param tstart : Start time of simulation : numeric
+#' @param tfinal : Final time of simulation : numeric
+#' @param dt : Times for which result is returned : numeric
+#' @param samples : Number of values to run between pmin and pmax : numeric
+#' @param parmin : Lower value for varied parameter : numeric
+#' @param parmax : Upper value for varied parameter : numeric
+#' @param samplepar : Name of parameter to be varied : character
+#' @param pardist : spacing of parameter values, can be either 'lin' or 'log' : character
 #' @return The function returns the output as a list,
 #' list element 'dat' contains the data frame with results of interest.
 #' The first column is called xvals and contains the values of the
 #' parameter that has been varied as specified by 'samplepar'.
 #' The remaining columns contain peak and steady state values of bacteria and immune response,
 #' Bpeak, Ipeak, Bsteady and Isteady.
-#' A final boolean variable 'nosteady' is returned for each simulation.
-#' It is TRUE if the simulation did not reach steady state, otherwise FALSE.
-#' @details A simple 2 compartment ODE model (the simple bacteria model introduced in the app of that name)
+#' A final boolean variable 'steady' is returned for each simulation.
+#' It is TRUE if the simulation reached steady state, otherwise FALSE.
+#' @details ##this code illustrates how to do analyze a simple model.
+#' A simple 2 compartment ODE model (the simple bacteria model introduced in the app of that name)
 #' is simulated for different parameter values.
+#' This function runs the simple bacterial infection model for a range of parameters.
 #' The user can specify which parameter is sampled, and
 #' the simulation returns for each parameter sample the peak and final value for B and I.
 #' Also returned is the varied parameter and an indicator if steady state was reached.
+#' @section Notes: The parameter dt only determines for which times the solution is returned,
+#' it is not the internal time step. The latter is set automatically by the ODE solver.
 #' @section Warning: This function does not perform any error checking. So if
 #'   you try to do something nonsensical (e.g. specify negative parameter values
 #'   or fractions > 1), the code will likely abort with an error message.
 #' @examples
 #' # To run the simulation with default parameters just call the function:
-#' res <- simulate_modelexploration()
+#' \dontrun{res <- simulate_modelexploration()}
 #' # To choose parameter values other than the standard one, specify them, like such:
-#' res <- simulate_modelexploration(dI = 0.1, r = 10, tmax = 100)
+#' res <- simulate_modelexploration(tfinal=100, samples=5, samplepar='Bmax', parmin=1e1, parmax=1e5)
 #' # You should then use the simulation result returned from the function, like this:
 #' plot(res$dat[,"xvals"],res$data[,"Bpeak"],xlab='Parameter values',ylab='Peak Bacteria',type='l')
 #' @seealso See the shiny app documentation corresponding to this simulator
@@ -57,7 +52,7 @@
 #' @export
 
 
-simulate_modelexploration <- function(B0 = 10, I0 = 1, tmax = 30, g=1, Bmax=1e6, dB=1e-1, k=1e-7, r=1e-3, dI=1, samplepar='k', pmin=1e-8, pmax=1e-5, samples = 10, pardist = 'lin')
+simulate_modelexploration <- function(B = 10, I = 1, g=1, Bmax=1e6, dB=1e-1, k=1e-7, r=1e-3, dI=1, tstart = 0, tfinal = 200, dt = 0.1, samples = 10, parmin=1e-8, parmax=1e-5, samplepar='k',  pardist = 'lin')
   {
 
 
@@ -69,11 +64,11 @@ simulate_modelexploration <- function(B0 = 10, I0 = 1, tmax = 30, g=1, Bmax=1e6,
 
     #create values for the parameter of interest to sample over
     #do equal spacing in log space
-    if (pardist == 'lin') {parvec=seq(pmin,pmax,length=samples)}
-    if (pardist == 'log') {parvec=10^seq(log10(pmin),log10(pmax),length=samples)}
+    if (pardist == 'lin') {parvec=seq(parmin,parmax,length=samples)}
+    if (pardist == 'log') {parvec=10^seq(log10(parmin),log10(parmax),length=samples)}
 
 
-    nosteady = rep(FALSE,samples) #indicates if steady state has not been reached
+    steady = rep(TRUE,samples) #indicates if steady state has not been reached
     for (n in 1:samples)
     {
         #replace value of parameter we want to vary
@@ -84,29 +79,32 @@ simulate_modelexploration <- function(B0 = 10, I0 = 1, tmax = 30, g=1, Bmax=1e6,
         if (samplepar == 'r') {r = parvec[n]}
         if (samplepar == 'dI') {dI = parvec[n]}
 
+
         #this runs the bacteria ODE model for each parameter sample
         #all other parameters remain fixed
-        odeout <- simulate_basicbacteria(B0 = B0, I0 = I0, tmax = tmax, g=g, Bmax=Bmax, dB=dB, k=k, r=r, dI=dI)
+        odeout <- simulate_basicbacteria_ode(B = B, I = I, g = g, Bmax = Bmax, dB = dB, k = k, r = r, dI = dI, tstart = tstart, tfinal = tfinal, dt = dt)
 
         timeseries = odeout$ts
 
-        Bpeak[n]=max(timeseries[,"Bc"]); #get the peak for B
-        Ipeak[n]=max(timeseries[,"Ic"]);
-        Bsteady[n] = utils::tail(timeseries[,"Bc"],1)
-        Isteady[n] = utils::tail(timeseries[,"Ic"],1)
+        Bpeak[n]=max(timeseries[,"B"]); #get the peak for B
+        Ipeak[n]=max(timeseries[,"I"]);
+        Bsteady[n] = utils::tail(timeseries[,"B"],1)
+        Isteady[n] = utils::tail(timeseries[,"I"],1)
 
         #a quick check to make sure the system is at steady state,
         #i.e. the value for B at the final time is not more than
         #1% different than B several time steps earlier
         vl=nrow(timeseries);
-        if ((abs(timeseries[vl,"Bc"]-timeseries[vl-10,"Bc"])/timeseries[vl,"Bc"])>1e-2)
+        if ((abs(timeseries[vl,"B"]-timeseries[vl-10,"B"])/timeseries[vl,"B"])>1e-2)
         {
-          nosteady[n] = TRUE
+          steady[n] = FALSE
         }
     }
 
+    #final list structure containing all results that are returned
     result = list()
-    dat = data.frame(xvals = parvec, Bpeak = Bpeak, Ipeak=Ipeak, Bsteady = Bsteady, Isteady = Isteady, nosteady = nosteady)
+    dat = data.frame(xvals = parvec, Bpeak = Bpeak, Ipeak=Ipeak, Bsteady = Bsteady, Isteady = Isteady, steady = steady)
     result$dat = dat
+
     return(result)
 }

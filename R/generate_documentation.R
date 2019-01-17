@@ -4,27 +4,30 @@
 #' and extracts sections
 #' to generate the tabs with content for each Shiny app.
 #' This is a helper function and only useful for this package.
+#' @param docfilename of html file containing the documentation
 #' @return tablist A list of tabs for display in a Shiny UI.
 #' @details This function is called by the Shiny UIs to populate the documentation and information tabs.
 #' @author Andreas Handel
 #' @export
 
-generate_documentation <- function()
+generate_documentation <- function(docfilename)
 {
     #take HTML file and split it into components for each tab
-    currentdir = getwd()
     tablist = NULL
     tabtitles = c('Overview','The Model','What to do','Further Information')
-    htmlfile = list.files(path = currentdir, pattern = "\\.html$")
-   html.raw <- XML::htmlTreeParse(htmlfile, useInternalNodes = TRUE, encoding='UTF-8')
+    html.raw <- XML::htmlTreeParse(docfilename, useInternalNodes = TRUE, encoding='UTF-8')
     shinyblocks = XML::getNodeSet(html.raw, "//div[@id[starts-with(., 'shinytab')]]")
     for (i in 1:4)
     {
       subDoc <- XML::xmlDoc(shinyblocks[[i]])
       content <- XML::xpathApply(subDoc, "//div[@id[starts-with(., 'shinytab')]]", XML::saveXML, encoding='UTF-8')
       htmlcontent = shiny::HTML(content[[1]])
+      #remove the main headings since they are shown on the tab titles
+      pattern = "<h2>.+</h2>" #everything between the <h2> elements
+      htmlcontent = gsub(pattern,"<br>",htmlcontent)
       tablist[[i]] = shiny::tabPanel(tabtitles[i], htmlcontent, icon = NULL)
     }
+    #browser()
     return(tablist)
 }
 

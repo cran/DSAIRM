@@ -4,76 +4,79 @@
 \alias{simulate_usanalysis}
 \title{Simulation to illustrate uncertainty and sensitivity analysis}
 \usage{
-simulate_usanalysis(B0min = 1, B0max = 10, I0min = 1, I0max = 10,
+simulate_usanalysis(Bmin = 1, Bmax = 10, Imin = 1, Imax = 10,
   Bmaxmin = 1e+05, Bmaxmax = 1e+06, dBmin = 0.1, dBmax = 0.1,
   kmin = 1e-07, kmax = 1e-07, rmin = 0.001, rmax = 0.001,
-  dImin = 1, dImax = 2, gmean = 0.5, gvar = 0.1, tmax = 30,
-  samples = 10, rngseed = 100)
+  dImin = 1, dImax = 2, gmean = 0.5, gvar = 0.1, samples = 10,
+  rngseed = 100, tstart = 0, tfinal = 200, dt = 0.1)
 }
 \arguments{
-\item{B0min}{lower bound for initial bacteria numbers}
+\item{Bmin}{: lower bound for initial bacteria numbers : numeric}
 
-\item{B0max}{upper bound for initial bacteria numbers}
+\item{Bmax}{: upper bound for initial bacteria numbers : numeric}
 
-\item{I0min}{lower bound for initial immune response}
+\item{Imin}{: lower bound for initial immune response : numeric}
 
-\item{I0max}{upper bound for initial immune response}
+\item{Imax}{: upper bound for initial immune response : numeric}
 
-\item{Bmaxmin}{lower bound for maximum bacteria load}
+\item{Bmaxmin}{: lower bound for maximum bacteria load : numeric}
 
-\item{Bmaxmax}{upper bound for maximum bacteria load}
+\item{Bmaxmax}{: upper bound for maximum bacteria load : numeric}
 
-\item{dBmin}{lower bound for bacteria death rate}
+\item{dBmin}{: lower bound for bacteria death rate : numeric}
 
-\item{dBmax}{upper bound for bacteria death rate}
+\item{dBmax}{: upper bound for bacteria death rate : numeric}
 
-\item{kmin}{lower bound for immune response kill rate}
+\item{kmin}{: lower bound for immune response kill rate : numeric}
 
-\item{kmax}{upper bound for immune response kill rate}
+\item{kmax}{: upper bound for immune response kill rate : numeric}
 
-\item{rmin}{lower bound for immune response growth rate}
+\item{rmin}{: lower bound for immune response growth rate : numeric}
 
-\item{rmax}{upper bound for immune response growth rate}
+\item{rmax}{: upper bound for immune response growth rate : numeric}
 
-\item{dImin}{lower bound for immune response death rate}
+\item{dImin}{: lower bound for immune response death rate : numeric}
 
-\item{dImax}{upper bound for immune response death rate}
+\item{dImax}{: upper bound for immune response death rate : numeric}
 
-\item{gmean}{mean for bacteria growth rate}
+\item{gmean}{: mean for bacteria growth rate : numeric}
 
-\item{gvar}{variance for bacteria growth rate}
+\item{gvar}{: variance for bacteria growth rate : numeric}
 
-\item{tmax}{maximum simulation time, units depend on choice of units for model parameters}
+\item{samples}{: number of LHS samples to run : numeric}
 
-\item{samples}{number of LHS samples to run}
+\item{rngseed}{: seed for random number generator : numeric}
 
-\item{rngseed}{seed for random number generator}
+\item{tstart}{: Start time of simulation : numeric}
+
+\item{tfinal}{: Final time of simulation : numeric}
+
+\item{dt}{: times for which result is returned : numeric}
 }
 \value{
 The function returns the output as a list.
-The list element 'dat' contains a data frame
-with sample values for each parameter as columns, followed by columns for the results.
-A final variable 'nosteady' is returned for each simulation.
-It is TRUE if the simulation did not reach steady state, otherwise FALSE.
+The list element 'dat' contains a data frame.
+The simulation returns for each parameter sample the peak and final value for B and I.
+Also returned are all parameter values as individual columns
+and an indicator stating if steady state was reached.
+A final variable 'steady' is returned for each simulation.
+It is TRUE if the simulation did reach steady state, otherwise FALSE.
 }
 \description{
 This function performs uncertainty and sensitivity analysis
 using the simple, continuous-time basic bacteria model.
-The user provides ranges for the initial conditions and parameter values and the number of samples.
-The function does Latin Hypercube Sampling (LHS) of the parameters
-and runs the basic bacteria ODE model for each sample.
-The function returns a list containing values for each sample and results.
 }
 \details{
 A simple 2 compartment ODE model (the simple bacteria model introduced in the app of that name)
 is simulated for different parameter values.
-Parameters are sampled via Latin Hypercube Sampling.
+The user provides ranges for the initial conditions and parameter values and the number of samples.
+The function does Latin Hypercube Sampling (LHS) of the parameters
+and runs the basic bacteria ODE model for each sample.
 Distribution for all parameters is assumed to be uniform between the min and max values.
 The only exception is the bacteria growth parameter,
 which is assumed to be gamma distributed with the specified mean and variance.
-The simulation returns for each parameter sample the peak and final value for B and I.
-Also returned are all parameter values as individual columns
-and an indicator stating if steady state was reached.
+This code is part of the DSAIRM R package.
+For additional model details, see the corresponding app in the DSAIRM package.
 }
 \section{Warning}{
  This function does not perform any error checking. So if
@@ -83,9 +86,9 @@ and an indicator stating if steady state was reached.
 
 \examples{
 # To run the simulation with default parameters just call the function:
-result <- simulate_usanalysis()
+\dontrun{result <- simulate_usanalysis()}
 # To choose parameter values other than the standard one, specify them, like such:
-result <- simulate_usanalysis(dImin = 0.1, dImax = 10, samples = 5)
+result <- simulate_usanalysis(dImin = 0.1, dImax = 10, samples = 5, tfinal = 50)
 # You should then use the simulation result returned from the function, like this:
 plot(result$dat[,"dI"],result$dat[,"Bpeak"],xlab='values for d',ylab='Peak Bacteria',type='l')
 }
