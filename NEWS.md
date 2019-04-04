@@ -1,18 +1,38 @@
+# DSAIRM 0.8
+
+* Moved version number to be consistent with sister package DSAIDE
+* Updated vignette
+* Minor cleanup
+* More unit tests
+
+# DSAIRM 0.6
+
+## User facing changes
+
+* User can switch between ggplot and plotly for figures
+* The list of "what to do" tasks can be floated
+* Additional UI improvement
+
+## Other changes
+
+* More unit tests
+
 # DSAIRM 0.5.5
 
+* Released to CRAN
 * Improved way to download simulator functions
-* Fixed typos and other minor mistakes in app documentations.
+* Fixed typos and other minor mistakes in app documentations
 * Included functionality that allows shinyappsio deployment
 
 # DSAIRM 0.5.0
 
-* Complete rebuild of back-end and structure, changing from multiple independent shiny apps to a single one.
-* Some user-facing updates and enhancements.
-* Fixed typos and other minor mistakes in app documentations.
+* Complete rebuild of back-end and structure, changing from multiple independent shiny apps to a single one
+* Some user-facing updates and enhancements
+* Fixed typos and other minor mistakes in app documentations
 
 # DSAIRM 0.4.0
 
-* Fully functional first release to CRAN.
+* Fully functional first release to CRAN
 
 
 # DSAIRM  0.3.0

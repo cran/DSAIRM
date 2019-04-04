@@ -2,6 +2,9 @@
 title: Basic Bacteria and Immune Response Model
 output:
   html_document:
+    theme: null
+    highlight: null
+    fig_retina: null
     fig_caption: true
     mathjax: default 
     keep_md: false
@@ -101,9 +104,9 @@ In words, the number of bacteria and immune response at a time step _dt_ in the 
 Start with the following parameter settings in your model:
 
 * 100 initial bacteria, an initial level of 1 for the immune response, a simulation start time of 0 and final time of 100 (which we assume to be days).
-* Assume bacteria grow at a rate of 1 per day, the carrying capacity is 10^5^ and they live for about 2 days (the inverse of the lifespan is the rate of death)
+* Assume bacteria grow at a rate of 1 per day, the carrying capacity is 10^5^ and they live for about 2 days (the inverse of the lifespan is the rate of death).
 * Assume the immune response is activated at a rate of 10^-4^, kills bacteria at a rate of 10^-4^ and decays at a rate of 2 per day.
-* Only run the continuous time model. Therefore, the value for the time-step _dt_ for the discrete model does not matter, you can leave it as is. Plot both x- and y-axes on a linear scale.
+* Only run the continuous time ODE model. Therefore, the value for the time-step _dt_ for the discrete model does not matter, you can leave it as is. Plot both x- and y-axes on a linear scale.
 
 Run the simulation, see what you get. You should see some oscillations and then the system settles down, with bacteria and immune response at the end of the simulation at around 19996 and 3003. 
 
@@ -158,7 +161,7 @@ You should get a plot where bacteria numbers drop to below 1 and take on fractio
 ## Further Information {#shinytab4}
 
 * This app (and all others) are structured such that the Shiny part (the graphical interface you see and the server-side function that goes with it) calls an underlying R script (or several) which runs the simulation for the model of interest and returns the results.
-* For this app, the underlying functions running the simulation are called ``r simfunction[1]`` and ``r simfunction[2]``. You can call them directly, without going through the shiny app. Use the `help()` command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself. 
+* For this app, the underlying functions running the simulation are called ``r appsettings$simfunction[1]`` and ``r appsettings$simfunction[2]``. You can call them directly, without going through the shiny app. Use the `help()` command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself. 
 * You can also download all simulator functions and modify them for your own purposes.  Of course to modify these functions, you'll need to do some coding.
 * For examples on using the simulators directly and how to modify them, read the package vignette by typing `vignette('DSAIRM')` into the R console.
 * The model we are exploring here belongs to a class of well-studied models in ecology known as predator-prey models. If you want to learn more about these kinds of models, see e.g. [@otto11]. The models in those references are described in the context of ecology, but results transfer to within-host situation. 

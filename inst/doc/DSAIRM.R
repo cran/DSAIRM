@@ -4,6 +4,18 @@
 ## ---- eval=FALSE, echo=TRUE----------------------------------------------
 #  dsairmmenu()
 
+## ----dsaidemenu,  fig.cap='Main menu of the DSAIRM package.', echo=FALSE----
+knitr::include_graphics("mainmenu.png")
+
+## ----appexample,  fig.cap='Screenshot of the input-output elements of one of the apps.', echo=FALSE----
+knitr::include_graphics("appexample.png")
+
+## ----modelexample,  fig.cap='Screenshot of the _Model_ section of one of the apps.', echo=FALSE----
+knitr::include_graphics("modelexample.png")
+
+## ----whattodoexample,  fig.cap='Screenshot of the _What to do_ section of one of the apps.', echo=FALSE----
+knitr::include_graphics("whattodoexample.png")
+
 ## ---- eval=TRUE, echo=FALSE, message=FALSE-------------------------------
 library('DSAIRM')
 
@@ -11,10 +23,14 @@ library('DSAIRM')
 #  help('simulate_basicbacteria_ode')
 
 ## ---- eval=TRUE, echo=TRUE-----------------------------------------------
-result <- simulate_basicbacteria_ode(g = 0.5, r = 0.002)
+result <- simulate_basicbacteria_ode()
 
 ## ---- eval=TRUE, echo=TRUE-----------------------------------------------
-plot(result$ts[,"time"],result$ts[,"B"],xlab='Time',ylab='Bacteria Numbers',type='l')
+plot(result$ts[ , "time"],result$ts[ , "B"],xlab='Time',ylab='Bacteria',type='l')
+
+## ---- eval=TRUE, echo=TRUE-----------------------------------------------
+result <- simulate_basicbacteria_ode(g = 0.5, r = 0.002)
+plot(result$ts[ , "time"],result$ts[ , "B"],xlab='Time',ylab='Bacteria',type='l')
 
 ## ---- eval=TRUE, echo=TRUE-----------------------------------------------
 #values for immune activation rate, r, for which to run the simulation
@@ -52,21 +68,21 @@ plot(rvec,Bpeak,type='p',xlab='Immune activation rate',ylab='Peak bacteria',log=
 #  dBdt = g*B*(1-B/Bmax) - dB*B - k*B*I
 #  dIdt = r*B*I/(s+B) - dI*I
 
-## ----eval=TRUE, echo=TRUE------------------------------------------------
-#initialize the new function
-#it needs to be in the same directory as this code
-source('mysimulator.R') 
-#values of saturation parameter to explore
-svec = 10^seq(-3,3,length=20)  
-#this will record the maximum immune response level
-Imax = rep(0,length(svec)) 
-for (n in 1:length(svec))
-{
-  #run the simulation model for different values of s 
-  #for simplicity, all other inputs are kept at their defaults
-  result <- mysimulator(s = svec[n]) 
-  #record max immune response for each value of s
-  Imax[n] <- max(result$ts[,"I"])
-}
-plot(svec,Imax,type='p',xlab='Saturation parameter',ylab='Max immune response level',log='xy')
+## ----eval=FALSE, echo=TRUE-----------------------------------------------
+#  #initialize the new function
+#  #it needs to be in the same directory as this code
+#  source('mysimulator.R')
+#  #values of saturation parameter to explore
+#  svec = 10^seq(-3,3,length=20)
+#  #this will record the maximum immune response level
+#  Ipeak = rep(0,length(svec))
+#  for (n in 1:length(svec))
+#  {
+#    #run the simulation model for different values of s
+#    #for simplicity, all other inputs are kept at their defaults
+#    result <- mysimulator(s = svec[n])
+#    #record max immune response for each value of s
+#    Ipeak[n] <- max(result$ts[,"I"])
+#  }
+#  plot(svec,Ipeak,type='p',xlab='Saturation parameter, s',ylab='Peak immune response',log='xy')
 
