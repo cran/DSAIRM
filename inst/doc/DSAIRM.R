@@ -16,7 +16,7 @@ knitr::include_graphics("modelexample.png")
 ## ----whattodoexample,  fig.cap='Screenshot of the _What to do_ section of one of the apps.', echo=FALSE----
 knitr::include_graphics("whattodoexample.png")
 
-## ---- eval=TRUE, echo=FALSE, message=FALSE-------------------------------
+## ---- eval=TRUE, message=FALSE-------------------------------------------
 library('DSAIRM')
 
 ## ----eval=FALSE, echo=TRUE-----------------------------------------------
