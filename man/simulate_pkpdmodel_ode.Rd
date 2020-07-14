@@ -4,10 +4,28 @@
 \alias{simulate_pkpdmodel_ode}
 \title{PkPd Virus model}
 \usage{
-simulate_pkpdmodel_ode(U = 1e+07, I = 0, V = 1, n = 0, dU = 0,
-  dI = 1, dV = 2, b = 2e-07, g = 1, p = 5, C0 = 2, dC = 0.5,
-  C50 = 1, k = 2, Emax = 1, txstart = 10, txinterval = 5,
-  tstart = 0, tfinal = 30, dt = 0.1)
+simulate_pkpdmodel_ode(
+  U = 1e+05,
+  I = 0,
+  V = 10,
+  n = 0,
+  dU = 0,
+  dI = 1,
+  dV = 2,
+  b = 1e-05,
+  g = 1,
+  p = 10,
+  C0 = 1,
+  dC = 1,
+  C50 = 1,
+  k = 1,
+  Emax = 0,
+  txstart = 10,
+  txinterval = 1,
+  tstart = 0,
+  tfinal = 20,
+  dt = 0.01
+)
 }
 \arguments{
 \item{U}{: initial number of uninfected target cells : numeric}
@@ -38,7 +56,7 @@ simulate_pkpdmodel_ode(U = 1e+07, I = 0, V = 1, n = 0, dU = 0,
 
 \item{k}{: steepness of concentration-dependent drug effect : numeric}
 
-\item{Emax}{: maximum drug effect (0-1) : numeric}
+\item{Emax}{: maximum drug efficacy (0-1) : numeric}
 
 \item{txstart}{: time of drug treatment start : numeric}
 

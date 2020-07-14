@@ -12,7 +12,7 @@ test_that("fit apps all run correctly",
             modelsettings$usesimdata = 0
             modelsettings$plotscale = 'y'
             modelsettings$solvertype = 1
-            modelsettings$simfunction = 'simulate_fit_basicmodel'
+            modelsettings$simfunction = 'simulate_basicvirus_fit'
 
             result = run_model(modelsettings)
             finaldatapoint = tail(result[[1]]$dat$yvals,1)
@@ -20,26 +20,26 @@ test_that("fit apps all run correctly",
 
             modelsettings$usesimdata = 1
             result = run_model(modelsettings)
-            testthat::  expect_is(generate_ggplot(result), "ggplot" )
+            testthat::expect_is(generate_ggplot(result), "ggplot" )
 
             #test model comparison fit app
             modelsettings =  list(fitmodel = 1, iter = 10)
             modelsettings$modeltype = "_fit_"
             modelsettings$nplots = 1
             modelsettings$plotscale = 'both'
-            modelsettings$simfunction = 'simulate_fit_modelcomparison'
+            modelsettings$simfunction = 'simulate_modelcomparison_fit'
             result = run_model(modelsettings)
-            testthat::  expect_is(generate_ggplot(result), "ggplot" )
-            testthat::  expect_is(generate_plotly(result), "plotly" )
+            testthat::expect_is(generate_ggplot(result), "ggplot" )
+            testthat::expect_is(generate_plotly(result), "plotly" )
 
             #test model comparison fit app, 1nd model
             modelsettings =  list(fitmodel = 2, iter = 10)
             modelsettings$modeltype = "_fit_"
             modelsettings$nplots = 1
-            modelsettings$simfunction = 'simulate_fit_modelcomparison'
+            modelsettings$simfunction = 'simulate_modelcomparison_fit'
             result = run_model(modelsettings)
-            testthat::  expect_is(generate_ggplot(result), "ggplot" )
-            testthat::  expect_is(generate_plotly(result), "plotly" )
+            testthat::expect_is(generate_ggplot(result), "ggplot" )
+            testthat::expect_is(generate_plotly(result), "plotly" )
 
 
             #test CI fit app - this one should not work
@@ -48,20 +48,23 @@ test_that("fit apps all run correctly",
             testthat::expect_equal(result, "List element simfunction must be provided.")
 
             #test CI fit app - this one should work
+            modelsettings =  list()
             modelsettings$modeltype = "_fit_"
-            modelsettings$simfunction = 'simulate_fit_confint'
+            modelsettings$simfunction = 'simulate_confint_fit'
             modelsettings$iter = 10
+            modelsettings$nsample = 40
             result = run_model(modelsettings)
-            testthat::  expect_is(generate_ggplot(result), "ggplot" )
-            testthat::  expect_is(generate_text(result), "html" )
+            testthat::expect_is(generate_ggplot(result), "ggplot" )
+            testthat::expect_is(generate_text(result), "html" )
 
-            #test CI fit app - this one should work
+            #test flu drug fit app
+            modelsettings =  list()
             modelsettings$modeltype = "_fit_"
-            modelsettings$simfunction = 'simulate_fit_confint'
-            modelsettings$parscale = "log"
+            modelsettings$simfunction = 'simulate_fludrug_fit'
             modelsettings$iter = 10
             result = run_model(modelsettings)
-            testthat::  expect_is(generate_ggplot(result), "ggplot" )
-            testthat::  expect_is(generate_text(result), "html" )
+            testthat::expect_is(generate_ggplot(result), "ggplot" )
+            testthat::expect_is(generate_text(result), "html" )
+
 
 })

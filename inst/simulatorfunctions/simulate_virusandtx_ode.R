@@ -48,7 +48,7 @@
 #' plot(result$ts[,"time"],result$ts[,"V"],xlab='Time',ylab='Virus',type='l',log='y')
 #' @export
 
-simulate_virusandtx_ode <- function(U = 1e5, I = 0, V = 1, n=1e4, dU = 0.1, dI = 1, dV = 2, b = 1e-5, p = 10, g = 1, f = 0, e = 0, tstart = 0, tfinal = 30, dt = 0.1, steadystate = FALSE, txstart = 0)
+simulate_virusandtx_ode <- function(U = 1e5, I = 0, V = 10, n=1e4, dU = 0.1, dI = 1, dV = 2, b = 1e-5, p = 10, g = 1, f = 0, e = 0, tstart = 0, tfinal = 30, dt = 0.1, steadystate = FALSE, txstart = 0)
 {
 
 
@@ -61,9 +61,10 @@ simulate_virusandtx_ode <- function(U = 1e5, I = 0, V = 1, n=1e4, dU = 0.1, dI =
 
         enow = ifelse(t>txstart,e,0) #turn on drug at time txstart
         fnow = ifelse(t>txstart,f,0) #turn on drug at time txstart
+
         dUdt = n - dU*U - (1-fnow)*b*V*U
         dIdt = (1-fnow)*b*V*U - dI*I
-        dVdt = (1-enow)*p*I - dV*V - g*b*U*V
+        dVdt = (1-enow)*p*I - dV*V - (1-fnow)*g*b*U*V
 
         list(c(dUdt, dIdt, dVdt))
       }
@@ -71,7 +72,7 @@ simulate_virusandtx_ode <- function(U = 1e5, I = 0, V = 1, n=1e4, dU = 0.1, dI =
   } #end function specifying the ODEs
 
 
-  #override user-supplied initial conditions and instead start with steady state values
+  #override user-supplied initial conditions and instead start with steady state values (in absence of any treatment)
   if (steadystate == TRUE) {U = max(0,dV*dI/(b*(p-dI*g))); I = max(0, (b*n*(dI*g-p)+dI*dU*dV) /(b * (dI^2*g - dI*p))); V = max(0,  - (b*n*(dI*g-p)+dI*dU*dV) /  (b*dV*dI))}
 
   Y0 = c(U = U, I = I, V = V);  #combine initial conditions into a vector

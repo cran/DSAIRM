@@ -11,13 +11,30 @@ output:
 bibliography: references.bib
 ---
 
-```{r, echo = FALSE}
-#this code loads the settings file for the current app so we can automatically 
-#list the functions in the further information section
+```{r, include = FALSE}
+#*************************************
+#general setup to define package and get path locations
+#all paths are inside the package and retrieved with system.file
+packagename = "DSAIRM"
+helperdir = "helperfunctions"
+mbmodeldir = "mbmodels"
+figuredir = "media"
+appdocdir = "appinformation" 
+#*************************************
+#Note: for this to process/knit, several helper functions need to be available (sourced) first
+#those are in the inst/helperfunctions folder
+#Note: in general, the "processing-script.R" in the docsfordevelopers should be used to produce the html docs
+#manual knitting of each doc only during development/testing
+#*************************************
+files_to_source = list.files(system.file(helperdir,package = packagename),full.names=TRUE)
+sapply(files_to_source, source) #sourcing needs to happen inside each Rmd file since knitr starts a new environment
+#load the settings file for the current app 
+#so we can automatically include figure, list the functions in the further information section
+#and use other information specific to the current app for the task table generation
 currentrmdfile = knitr::current_input() 
-currentappinfo = gsub("_documentation.Rmd" ,"_settings.R",currentrmdfile)
-source(currentappinfo)
+appsettings = get_settings(currentrmdfile,appdocdir,packagename)
 ```
+
 
 ## Overview {#shinytab1}
 This app allows exploration of a very basic bacteria infection model, with one compartment for bacteria and one compartment for the immune response. The main goal for this app is to get you familiar with dynamical systems models, as well as the overall setup and ideas behind using these simulations, and how to run them. Read about the model in "The Model" tab. Then do the tasks described in the "What to do" tab.
@@ -48,7 +65,7 @@ For our system, we specify the following processes/flows:
 A very good way to describe compartmental models and move from a verbal description toward a mathematical/computational formulation is by using diagrams. Being able to go back and forth between verbal description, diagram and mathematical/computational model is a crucial skill when building models. 
 The diagram for a compartmental model is often called flow diagram. It consists of a box for each compartment (here **B** and **I**), and arrows pointing in and out of boxes to describe flows and interactions. For the model described above, the flow diagram looks as follows:
 
-```{r BIdiagram,  fig.cap='Flow diagram for simple bacteria infection model.',  echo=FALSE}
+```{r BIdiagram,  fig.cap='',  echo=FALSE, out.width = "70%"}
 knitr::include_graphics("../media/bacteriamodel.png")
 ```
 
@@ -104,7 +121,7 @@ In words, the number of bacteria and immune response at a time step _dt_ in the 
 Start with the following parameter settings in your model:
 
 * 100 initial bacteria, an initial level of 1 for the immune response, a simulation start time of 0 and final time of 100 (which we assume to be days).
-* Assume bacteria grow at a rate of 1 per day, the carrying capacity is 10^5^ and they live for about 2 days (the inverse of the lifespan is the rate of death).
+* Assume bacteria grow at a rate of 1 per day, the carrying capacity is 10^5^ and they live for about 2 days (remember that the inverse of the lifespan is the rate of death, and make sure you convert to the right units).
 * Assume the immune response is activated at a rate of 10^-4^, kills bacteria at a rate of 10^-4^ and decays at a rate of 2 per day.
 * Only run the continuous time ODE model. Therefore, the value for the time-step _dt_ for the discrete model does not matter, you can leave it as is. Plot both x- and y-axes on a linear scale.
 

@@ -5,8 +5,10 @@
 #'
 #' @param modelsettings a list with model settings. Required list elements are: \cr
 #' modelsettings$simfunction - name of simulation function(s) as string.  \cr
+#' modelsettings$is_mbmodel - indicate of simulation function has mbmodel structure
 #' modelsettings$modeltype - specify what kind of model should be run.
-#' Currently one of: _ode_, _discrete_, _stochastic_, _usanalysis_, _modelexploration_, _fit_ . \cr
+#' Currently one of: _ode_, _discrete_, _stochastic_, _usanalysis_, _modelexploration_, _fit_. \cr
+#' For more than one model type, place _and_ between them. \cr
 #' modelsettings$plottype - 'Boxplot' or 'Scatterplot' , required for US app \cr
 #' Optinal list elements are: \cr
 #' List elements with names and values for inputs expected by simulation function.
@@ -52,6 +54,14 @@ run_model <- function(modelsettings) {
   if (is.null(modelsettings$simfunction)) { return("List element simfunction must be provided.") }
   if (is.null(modelsettings$modeltype)) { return("List element modeltype must be provided.") }
 
+
+  #if the user sets the model type, apply that choice
+  #that happens for any models that have an "_and_" in their modeltype variable as defined in the spreadsheet
+  if (grepl('_and_',modelsettings$modeltype))
+  {
+    modelsettings$modeltype = modelsettings$modeltypeUI
+  }
+
   datall = NULL #will hold data for all different models and replicates
   finaltext = NULL
   simfunction = modelsettings$simfunction #name(s) for model function(s) to run
@@ -61,7 +71,7 @@ run_model <- function(modelsettings) {
   ##################################
   if (grepl('_stochastic_',modelsettings$modeltype))
   {
-    modelsettings$currentmodel = simfunction[grep('_stochastic',simfunction)] # get the ode function
+    modelsettings$currentmodel = simfunction[grep('_stochastic',simfunction)] # get the stochastic function
     noutbreaks = 0
     nreps = ifelse(is.null(modelsettings$nreps),1,modelsettings$nreps)
     for (nn in 1:nreps)
@@ -82,6 +92,10 @@ run_model <- function(modelsettings) {
       #needs to be in the right format to be passed to generate_plots and generate_text
       #see documentation for those functions for details
       simresult <- simresult$ts
+      if (grepl('_and_',modelsettings$modeltype)) #this means  model is run with another one, relabel variables to indicate stochastic
+      {
+        colnames(simresult) = paste0(colnames(simresult),'_sto')
+      }
       colnames(simresult)[1] = 'xvals' #rename time to xvals for consistent plotting
       #reformat data to be in the right format for plotting
       rawdat = as.data.frame(simresult)
@@ -138,11 +152,16 @@ run_model <- function(modelsettings) {
   {
     modelsettings$currentmodel = simfunction[grep('_discrete',simfunction)] #list of model functions, get the ode function
     #run model
+
     simresult = try(eval(generate_fctcall(modelsettings)))
     checkres <- check_results(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
     simresult <- simresult$ts
+    if (grepl('_and_',modelsettings$modeltype)) #this means  model is run with another one, relabel variables to indicate discrete
+    {
+      colnames(simresult) = paste0(colnames(simresult),'_dis')
+    }
     colnames(simresult)[1] = 'xvals' #rename time to xvals for consistent plotting
     #reformat data to be in the right format for plotting
     rawdat = as.data.frame(simresult)
@@ -278,6 +297,8 @@ run_model <- function(modelsettings) {
   ##################################
   if (grepl('_fit_',modelsettings$modeltype))
   {
+
+
     modelsettings$currentmodel = simfunction
     simresult = try(eval(generate_fctcall(modelsettings)))
     checkres <- check_results(simresult)
@@ -286,7 +307,7 @@ run_model <- function(modelsettings) {
 
     colnames(simresult$ts)[1] = 'xvals' #rename time to xvals for consistent plotting
     #reformat data to be in the right format for plotting
-    #each plot/text output is a list entry with a data frame in form xvals, yvals, extra variables for stratifications for each plot
+    #each plot/text output is a list entry with a data frame in form xvals, yvals, extra variables for stratification for each plot
     rawdat = as.data.frame(simresult$ts)
     #using tidyr to reshape
     #dat = tidyr::gather(rawdat, -xvals, value = "yvals", key = "varnames")
@@ -297,8 +318,6 @@ run_model <- function(modelsettings) {
 
     #next, add data that's being fit to data frame
     fitdata  = simresult$data
-    colnames(fitdata) = c('xvals','yvals')
-    fitdata$varnames = 'Data'
     fitdata$style = 'point'
     datall = rbind(dat,fitdata)
 
@@ -323,13 +342,14 @@ run_model <- function(modelsettings) {
 
     ####################################################
     #different choices for text display for different fit models
-    if (grepl('basicmodel',simfunction))
+    #both DSAIDE and DSAIRM models
+    if (grepl('flu_fit',simfunction) || grepl('basicvirus_fit',simfunction))
     {
       txt1 <- paste('Best fit values for parameters',paste(names(simresult$bestpars), collapse = '/'), ' are ', paste(format(simresult$bestpars,  digits =2, nsmall = 2), collapse = '/' ))
       txt2 <- paste('Final SSR is ', format(simresult$SSR, digits =2, nsmall = 2))
       result[[1]]$finaltext = paste(txt1,txt2, sep = "<br/>")
     }
-    if (grepl('confint',simfunction))
+    if (grepl('confint_fit',simfunction))
     {
       txt1 <- paste('Best fit values for parameters', paste(names(simresult$bestpars), collapse = '/'), ' are ', paste(format(simresult$bestpars,  digits =2, nsmall = 2), collapse = '/' ))
       txt2 <- paste('Lower and upper bounds for parameter', paste(names(simresult$bestpars[1]), collapse = '/'), ' are ', paste(format(simresult$confint[1:2],  digits =2, nsmall = 2), collapse = '/' ))
@@ -337,7 +357,7 @@ run_model <- function(modelsettings) {
       txt4 <- paste('SSR is ', format(simresult$SSR, digits =2, nsmall = 2))
       result[[1]]$finaltext = paste(txt1,txt2,txt3,txt4, sep = "<br/>")
     }
-    if (grepl('modelcomparison',simfunction))
+    if (grepl('noro_fit',simfunction) || grepl('fludrug_fit',simfunction) || grepl('modelcomparison_fit',simfunction))
     {
       txt1 <- paste('Best fit values for model', modelsettings$fitmodel, 'parameters',paste(names(simresult$bestpars), collapse = '/'), ' are ', paste(format(simresult$bestpars,  digits =2, nsmall = 2), collapse = '/' ))
       txt2 <- paste('SSR and AICc are ',format(simresult$SSR, digits =2, nsmall = 2),' and ',format(simresult$AICc, digits =2, nsmall = 2))
