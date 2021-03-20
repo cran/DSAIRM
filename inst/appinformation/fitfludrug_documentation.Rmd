@@ -88,7 +88,7 @@ __Note: This simulation can take time to run, so be patient.__
 
 * Set number of uninfected cells to 10^5^, 1 virion, no infected cells.
 * Assume that infected cells have an average lifespan of 12 hours and virus of 6 hours (remember to convert this to rates and units in days). Those parameters are fixed and not fitted.
-* Set virus production rate to 10^-2^, infection rate to 10^-2^ and conversion factor to 1. The bounds for these parameters help in the fitting. If you run your fitting routine long enough (which we don't do here), these bounds should not affect the results, just the time it might take to find the best fit. Note that this is the theory, in practice that's not always true. See the fitting section for more on that. For now you can leave them as they are. The one think you always need to make sure is that the lower bound is positive and the starting value is between the lower and upper bound.  
+* Set virus production rate to 10^-2^, infection rate to 10^-2^ and conversion factor to 1. The bounds for these parameters help in the fitting. If you run your fitting routine long enough (which we don't do here), these bounds should not affect the results, just the time it might take to find the best fit. Note that this is the theory, in practice that's not always true. See the fitting section for more on that. For now you can leave them as they are. The one thing you always need to make sure is that the lower bound is positive and the starting value is between the lower and upper bound.  
 * Start with drug efficacy at some intermediate level, e.g. 0.5. You don't need to specify bounds here since they are given to be between 0 and 1 and thus hard-coded.
 * I suggest you choose a log scale for the y-axis and plotly as the plot engine. Using plotly allows you to click on the - rather busy - figure and turn on/off specific model components. By turning off all but the virus model fits, things are easier to see.
 * Fit model 1 for 500 iterations. Be patient, this might take a little while. 
@@ -107,8 +107,8 @@ Next, take a look at the numbers below the plot. Those are the estimated values 
 
 
 ## Further Information {#shinytab4}
-* This app (and all others) are structured such that the Shiny part (the graphical interface you see and the server-side function that goes with it) calls an underlying R script (or several) which runs the simulation for the model of interest and returns the results.
-* For this app, the underlying function running the simulation is called ``r appsettings$simfunction``. You can call them directly, without going through the shiny app. Use the `help()` command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself. 
+* For this app, the underlying function running the simulation is called ``r appsettings$simfunction``. That function repeatedly calls ``r appsettings$underlying_function``. 
+* This app (and all others) are structured such that the Shiny part (the graphical interface you are using) calls one or several underlying R functions which run the simulation for the model of interest and return the results. You can call them directly, without going through the shiny app. Use the `help()` command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself. 
 * You can also download all simulator functions and modify them for your own purposes.  Of course to modify these functions, you'll need to do some coding.
 * For examples on using the simulators directly and how to modify them, read the package vignette by typing `vignette('DSAIRM')` into the R console.
 * A model like this is used in [@handel20] to illustrate one of the ways models can be used.

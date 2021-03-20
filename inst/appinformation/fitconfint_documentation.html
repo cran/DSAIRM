@@ -14,10 +14,43 @@
 
 <title>Confidence Intervals via Bootstrapping</title>
 
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 
 
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -91,18 +124,18 @@
 <div id="shinytab4" class="section level2">
 <h2>Further Information</h2>
 <ul>
-<li>This app (and all others) are structured such that the Shiny part (the graphical interface you see and the server-side function that goes with it) calls an underlying R script (or several) which runs the simulation for the model of interest and returns the results.</li>
-<li>For this app, the underlying function running the simulation is called <code>simulate_confint_fit</code>. You can call them directly, without going through the shiny app. Use the <code>help()</code> command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself.</li>
+<li>For this app, the underlying function running the simulation is called <code>simulate_confint_fit</code>. That function repeatedly calls <code>simulate_basicvirus_ode</code>.</li>
+<li>This app (and all others) are structured such that the Shiny part (the graphical interface you are using) calls one or several underlying R functions which run the simulation for the model of interest and return the results. You can call them directly, without going through the shiny app. Use the <code>help()</code> command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself.</li>
 <li>You can also download all simulator functions and modify them for your own purposes. Of course to modify these functions, you’ll need to do some coding.</li>
 <li>For examples on using the simulators directly and how to modify them, read the package vignette by typing <code>vignette(&#39;DSAIRM&#39;)</code> into the R console.</li>
-<li>The bootstrapping routine is implemented with the <code>boot</code> package, which does the sampling and repeatedly calls the <code>nloptr</code> solver, which in turn runs the underlying simulation model <code>simulate_Basic_Virus_model_ode.R</code>.</li>
+<li>The bootstrapping routine is implemented with the <code>boot</code> package, which does the sampling and repeatedly calls the <code>nloptr</code> solver, which in turn runs the underlying simulation model.</li>
 <li>There are different versions of bootstrapping, i.e. data sampling. Some make assumptions about the distribution of the data (parametric bootstrap), others are very useful for time-series data, e.g. the concept of block-bootstrapping. See for instance <span class="citation">(Efron and Tibshirani 1993)</span> for more information.</li>
 </ul>
 <div id="references" class="section level3 unnumbered">
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-efron93">
-<p>Efron, Bradley, and Robert Tibshirani. 1993. <em>An introduction to the bootstrap</em>. New York: Chapman &amp; Hall.</p>
+<h3 class="unnumbered">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-efron93" class="csl-entry">
+Efron, Bradley, and Robert Tibshirani. 1993. <em><span class="nocase">An introduction to the bootstrap</span></em>. New York: Chapman &amp; Hall.
 </div>
 </div>
 </div>

@@ -14,10 +14,43 @@
 
 <title>Fit Flu Drug Model</title>
 
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 
 
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -36,7 +69,7 @@
 
 <div id="shinytab1" class="section level2">
 <h2>Overview</h2>
-<p>This app uses the same model and follows the same overall setup as the <em>Antiviral Treatment</em> app. You should go through that app first before exploring this one. The major difference is that for this app, instead of comparing model results to data in a qualitative manner, here the model is fit to the data. This provides a more rigorous, statistical way of comparing models and thus hypotheses. While this app does model fitting, the topic of fitting is not discussed here. There is a section in DSAIRM with multiple fitting related apps that focus on the details of how fitting simulation models to data works. For the purpose of this app, we treat all the fitting machinery as a ‘black box’.</p>
+<p>This app uses the same model and follows the same overall setup as the <em>Antiviral Treatment</em> app. You should go through that app first before exploring this one. The major difference is that for this app, instead of comparing model results to data in a qualitative manner, here the model is fit to the data. This provides a more rigorous, statistical way of comparing models and thus hypotheses. While this app does model fitting, the topic of fitting is not discussed here. There is a section in DSAIRM with multiple fitting related apps that focus on the details of how fitting simulation models to data works. For the purpose of this app, we treat all the fitting machinery as a ‘black box.’</p>
 <p>Read about the model in the “Model” tab. Then do the tasks described in the “What to do” tab. Learn more about the model and its origins in the “Further Information” tab.</p>
 </div>
 <div id="shinytab2" class="section level2">
@@ -72,7 +105,7 @@
 <ul>
 <li>Set number of uninfected cells to 10<sup>5</sup>, 1 virion, no infected cells.</li>
 <li>Assume that infected cells have an average lifespan of 12 hours and virus of 6 hours (remember to convert this to rates and units in days). Those parameters are fixed and not fitted.</li>
-<li>Set virus production rate to 10<sup>-2</sup>, infection rate to 10<sup>-2</sup> and conversion factor to 1. The bounds for these parameters help in the fitting. If you run your fitting routine long enough (which we don’t do here), these bounds should not affect the results, just the time it might take to find the best fit. Note that this is the theory, in practice that’s not always true. See the fitting section for more on that. For now you can leave them as they are. The one think you always need to make sure is that the lower bound is positive and the starting value is between the lower and upper bound.<br />
+<li>Set virus production rate to 10<sup>-2</sup>, infection rate to 10<sup>-2</sup> and conversion factor to 1. The bounds for these parameters help in the fitting. If you run your fitting routine long enough (which we don’t do here), these bounds should not affect the results, just the time it might take to find the best fit. Note that this is the theory, in practice that’s not always true. See the fitting section for more on that. For now you can leave them as they are. The one thing you always need to make sure is that the lower bound is positive and the starting value is between the lower and upper bound.<br />
 </li>
 <li>Start with drug efficacy at some intermediate level, e.g. 0.5. You don’t need to specify bounds here since they are given to be between 0 and 1 and thus hard-coded.</li>
 <li>I suggest you choose a log scale for the y-axis and plotly as the plot engine. Using plotly allows you to click on the - rather busy - figure and turn on/off specific model components. By turning off all but the virus model fits, things are easier to see.</li>
@@ -98,20 +131,20 @@
 <div id="shinytab4" class="section level2">
 <h2>Further Information</h2>
 <ul>
-<li>This app (and all others) are structured such that the Shiny part (the graphical interface you see and the server-side function that goes with it) calls an underlying R script (or several) which runs the simulation for the model of interest and returns the results.</li>
-<li>For this app, the underlying function running the simulation is called <code>simulate_fludrug_fit</code>. You can call them directly, without going through the shiny app. Use the <code>help()</code> command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself.</li>
+<li>For this app, the underlying function running the simulation is called <code>simulate_fludrug_fit</code>. That function repeatedly calls <code>simulate_virusandtx_ode</code>.</li>
+<li>This app (and all others) are structured such that the Shiny part (the graphical interface you are using) calls one or several underlying R functions which run the simulation for the model of interest and return the results. You can call them directly, without going through the shiny app. Use the <code>help()</code> command for more information on how to use the functions directly. If you go that route, you need to use the results returned from this function and produce useful output (such as a plot) yourself.</li>
 <li>You can also download all simulator functions and modify them for your own purposes. Of course to modify these functions, you’ll need to do some coding.</li>
 <li>For examples on using the simulators directly and how to modify them, read the package vignette by typing <code>vignette(&#39;DSAIRM&#39;)</code> into the R console.</li>
 <li>A model like this is used in <span class="citation">(Handel, La Gruta, and Thomas 2020)</span> to illustrate one of the ways models can be used.</li>
 </ul>
 <div id="references" class="section level3 unnumbered">
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-handel20">
-<p>Handel, Andreas, Nicole L. La Gruta, and Paul G. Thomas. 2020. “Simulation Modelling for Immunologists.” <em>Nature Reviews. Immunology</em> 20 (3): 186–95. <a href="https://doi.org/10.1038/s41577-019-0235-3">https://doi.org/10.1038/s41577-019-0235-3</a>.</p>
+<h3 class="unnumbered">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-handel20" class="csl-entry">
+Handel, Andreas, Nicole L. La Gruta, and Paul G. Thomas. 2020. <span>“Simulation Modelling for Immunologists.”</span> <em>Nature Reviews. Immunology</em> 20 (March): 186–95. <a href="https://doi.org/10.1038/s41577-019-0235-3">https://doi.org/10.1038/s41577-019-0235-3</a>.
 </div>
-<div id="ref-hayden96">
-<p>Hayden, F G, J J Treanor, R F Betts, M Lobo, J D Esinhart, and E K Hussey. 1996. “Safety and Efficacy of the Neuraminidase Inhibitor Gg167 in Experimental Human Influenza.” <em>JAMA</em> 275 (4): 295–99.</p>
+<div id="ref-hayden96" class="csl-entry">
+Hayden, F G, J J Treanor, R F Betts, M Lobo, J D Esinhart, and E K Hussey. 1996. <span>“Safety and Efficacy of the Neuraminidase Inhibitor Gg167 in Experimental Human Influenza.”</span> <em>JAMA</em> 275: 295–99.
 </div>
 </div>
 </div>
