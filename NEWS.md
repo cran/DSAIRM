@@ -1,3 +1,14 @@
+# DSAIRM 0.9.3 
+
+* Updated documentation to include more explicit reporting, DSAIDE style
+* Created full solutions to all apps
+* general bug-fixes and updates
+
+# DSAIRM 0.8.8 
+
+* small bug fixes and typos
+
+
 # DSAIRM 0.8.7 (2021-03-19)
 
 * Fixes to pass CRAN checks on old R

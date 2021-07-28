@@ -40,7 +40,7 @@
 #' the code will likely abort with an error message.
 #' @export
 
-simulate_basicbacteria_ode <- function(B = 100, I = 1, g = 1, Bmax = 1e+05, dB = 0.5, k = 1e-4, r = 1e-4, dI = 2, tstart = 0, tfinal = 100, dt = 0.05)
+simulate_basicbacteria_ode <- function(B = 100, I = 1, g = 1, Bmax = 1e+05, dB = 0.5, k = 1e-4, r = 1e-4, dI = 2, tstart = 0, tfinal = 100, dt = 0.01)
 {
 
   #Block of ODE equations for deSolve
@@ -60,7 +60,7 @@ simulate_basicbacteria_ode <- function(B = 100, I = 1, g = 1, Bmax = 1e+05, dB =
   timevec=seq(tstart,tfinal,by=dt)
   vars = c(B = B, I = I)
   pars = c(g = g, Bmax = Bmax, dB =dB, k = k, r=r,dI=dI)
-  odeout = deSolve::ode(y = vars, parms = pars, times = timevec,  func = basicbacteria_ode_fct, atol = 1e-12, rtol = 1e-12)
+  odeout = deSolve::ode(y = vars, parms = pars, times = timevec,  func = basicbacteria_ode_fct, atol = 1e-12, rtol = 1e-12, method = "vode")
   result <- list()
   result$ts <- as.data.frame(odeout)
   return(result)

@@ -55,8 +55,9 @@ run_model <- function(modelsettings) {
   if (is.null(modelsettings$modeltype)) { return("List element modeltype must be provided.") }
 
 
+
   #if the user sets the model type, apply that choice
-  #that happens for any models that have an "_and_" in their modeltype variable as defined in the spreadsheet
+  #that happens for any models that have an "_and_" in their modeltype variable as defined in the apptable.tsv spreadsheet
   if (grepl('_and_',modelsettings$modeltype))
   {
     modelsettings$modeltype = modelsettings$modeltypeUI
@@ -76,15 +77,25 @@ run_model <- function(modelsettings) {
     nreps = ifelse(is.null(modelsettings$nreps),1,modelsettings$nreps)
     for (nn in 1:nreps)
     {
-      #extract modesettings inputs needed for simulator function
-      if (is.null(modelsettings$tmax) & !is.null(modelsettings$tfinal) )
-      {
-        modelsettings$tmax = modelsettings$tfinal
-      }
+      #extract modelsettings inputs needed for simulator function
+
+      #all models should be using tfinal so turn this off
+      #if (is.null(modelsettings$tmax) & !is.null(modelsettings$tfinal) )
+      #{
+        #modelsettings$tmax = modelsettings$tfinal
+      #}
+
       #create function call, then evaluate it to run model
+      fctcall = generate_fctcall(modelsettings)
+      # this means an error occurred making the call
+      if (!is.call(fctcall))
+      {
+        #return error message generated when trying to build the function call
+        return(fctcall)
+      }
       #wrap in try command to catch errors
       #send result from simulator to a check function. If that function does not return null, exit run_model with error message
-      simresult = try(eval(generate_fctcall(modelsettings)))
+      simresult = try(eval(fctcall))
       checkres <- check_results(simresult)
       if (!is.null(checkres)) {return(checkres)}
 
@@ -118,9 +129,25 @@ run_model <- function(modelsettings) {
   ##################################
   if (grepl('_ode_',modelsettings$modeltype)) #need to always start with ode_ in model specification
   {
+
+    # stochastic doesn't support tstart and dt as inputs, thus they are not in the UI
+    # but they are needed if we run ode models at the same time
+    # therefore set here if they don't exist
+    if (is.null(modelsettings$tstart) ) {modelsettings$tstart = 0 }
+    if (is.null(modelsettings$dt) ) {modelsettings$dt = modelsettings$tfinal/1000 }
+
     modelsettings$currentmodel = simfunction[grep('_ode',simfunction)] #list of model functions, get the ode function
+
+    #make the call to the simulator function by parsing inputs
+    fctcall = generate_fctcall(modelsettings)
+    # this means an error occurred making the call
+    if (!is.call(fctcall))
+    {
+      #return error message generated when trying to build the function call
+      return(fctcall)
+    }
     #run model
-    simresult = try(eval(generate_fctcall(modelsettings)))
+    simresult = try(eval(fctcall))
     checkres <- check_results(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
@@ -147,9 +174,19 @@ run_model <- function(modelsettings) {
   if (grepl('_discrete_',modelsettings$modeltype))
   {
     modelsettings$currentmodel = simfunction[grep('_discrete',simfunction)] #list of model functions, get the ode function
-    #run model
 
-    simresult = try(eval(generate_fctcall(modelsettings)))
+    #create function call, then evaluate it to run model
+    fctcall = generate_fctcall(modelsettings)
+    # this means an error occurred making the call
+    if (!is.call(fctcall))
+    {
+      #return error message generated when trying to build the function call
+      return(fctcall)
+    }
+    #wrap in try command to catch errors
+    #send result from simulator to a check function. If that function does not return null, exit run_model with error message
+    simresult = try(eval(fctcall))
+
     checkres <- check_results(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
@@ -234,7 +271,20 @@ run_model <- function(modelsettings) {
   if (grepl('_usanalysis_',modelsettings$modeltype))
   {
     modelsettings$currentmodel = simfunction
-    simresult = try(eval(generate_fctcall(modelsettings)))
+
+    #create function call, then evaluate it to run model
+    fctcall = generate_fctcall(modelsettings)
+    # this means an error occurred making the call
+    if (!is.call(fctcall))
+    {
+      #return error message generated when trying to build the function call
+      return(fctcall)
+    }
+    #wrap in try command to catch errors
+    #send result from simulator to a check function. If that function does not return null, exit run_model with error message
+    simresult = try(eval(fctcall))
+
+
     checkres <- check_results(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
@@ -244,7 +294,7 @@ run_model <- function(modelsettings) {
     simdat = simresult$dat
 
     #number of columns - each outcome gets a column
-    result[[1]]$ncols = modelsettings$ncols
+    result[[1]]$ncols = modelsettings$nplots
 
     #loop over each outer list element corresponding to a plot and fill it with another list
     #of meta-data and data needed to create each plot
@@ -275,8 +325,12 @@ run_model <- function(modelsettings) {
         if (plotscale == 'y' | plotscale == 'both') { result[[ct]]$yscale = 'log10'}
 
         #the following are for text display for each plot
-        result[[ct]]$maketext = TRUE #if true we want the generate_text function to process data and generate text, if 0 no result processing will occur insinde generate_text
+        result[[ct]]$maketext = TRUE #if true we want the generate_text function to process data and generate text, if 0 no result processing will occur inside generate_text
         result[[ct]]$finaltext = paste("System might not have reached steady state", length(steady) - sum(steady), "times")
+
+        #set y-axis limits based on variable
+        result[[ct]]$ymin = min(result[[ct]]$dat$yvals, na.rm=TRUE)
+        result[[ct]]$ymax = max(result[[ct]]$dat$yvals, na.rm=TRUE)
 
         ct = ct + 1
     } #loop over plots
@@ -294,7 +348,19 @@ run_model <- function(modelsettings) {
 
 
     modelsettings$currentmodel = simfunction
-    simresult = try(eval(generate_fctcall(modelsettings)))
+
+    #create function call, then evaluate it to run model
+    fctcall = generate_fctcall(modelsettings)
+    # this means an error occurred making the call
+    if (!is.call(fctcall))
+    {
+      #return error message generated when trying to build the function call
+      return(fctcall)
+    }
+    #wrap in try command to catch errors
+    #send result from simulator to a check function. If that function does not return null, exit run_model with error message
+    simresult = try(eval(fctcall))
+
     checkres <- check_results(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
@@ -368,7 +434,19 @@ run_model <- function(modelsettings) {
   if (grepl('_modelexploration_',modelsettings$modeltype))
   {
     modelsettings$currentmodel = simfunction
-    simresult = try(eval(generate_fctcall(modelsettings)))
+
+    #create function call, then evaluate it to run model
+    fctcall = generate_fctcall(modelsettings)
+    # this means an error occurred making the call
+    if (!is.call(fctcall))
+    {
+      #return error message generated when trying to build the function call
+      return(fctcall)
+    }
+    #wrap in try command to catch errors
+    #send result from simulator to a check function. If that function does not return null, exit run_model with error message
+    simresult = try(eval(fctcall))
+
     checkres <- check_results(simresult)
     if (!is.null(checkres)) {return(checkres)}
 

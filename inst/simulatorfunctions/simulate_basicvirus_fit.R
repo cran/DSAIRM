@@ -53,7 +53,12 @@
 #' @export
 
 
-simulate_basicvirus_fit <- function(U = 1e6, I = 0, V = 1, n = 0, dU = 0, dI = 2, g = 0, p = 1e-3, plow = 1e-4, phigh = 1e2,  psim = 10, b = 1e-1, blow = 1e-3, bhigh = 1e1,  bsim = 1e-4, dV = 1, dVlow = 1e-2, dVhigh = 1e2,  dVsim = 5, noise = 0, iter = 1, solvertype = 1, usesimdata = 0)
+simulate_basicvirus_fit <- function(U = 1e6, I = 0, V = 1,
+                                    n = 0, dU = 0, dI = 2, g = 0,
+                                    p = 1e-3, plow = 1e-4, phigh = 1e2,  psim = 1e-3,
+                                    b = 1e-1, blow = 1e-3, bhigh = 1e1,  bsim = 1e-1,
+                                    dV = 1, dVlow = 1e-2, dVhigh = 1e2,  dVsim = 1,
+                                    noise = 0, iter = 1, solvertype = 1, usesimdata = 0)
 {
 
 
@@ -67,7 +72,7 @@ simulate_basicvirus_fit <- function(U = 1e6, I = 0, V = 1, n = 0, dU = 0, dI = 2
     allpars = c(Y0,params, tfinal = max(xvals), dt = 0.1, tstart = 0, fixedpars)
 
     #this function catches errors
-    odeout <- try(do.call(DSAIRM::simulate_basicvirus_ode, as.list(allpars)));
+    odeout <- try(do.call(DSAIRM::simulate_Basic_Virus_Model_ode, as.list(allpars)));
 
     #extract values for virus load at time points where data is available
     modelpred = odeout$ts[match(fitdata$xvals,odeout$ts[,"time"]),"V"];
@@ -119,7 +124,7 @@ simulate_basicvirus_fit <- function(U = 1e6, I = 0, V = 1, n = 0, dU = 0, dI = 2
     #simulate model with known parameters to get artifitial data
     #not sure why R needs it in such a weird form
     #but supplying vector of values to function directly doesn't work
-    odeout <- do.call(DSAIRM::simulate_basicvirus_ode, as.list(allpars))
+    odeout <- do.call(DSAIRM::simulate_Basic_Virus_Model_ode, as.list(allpars))
     simres = odeout$ts
 
     #extract values for virus load at time points where data is available
@@ -157,7 +162,7 @@ simulate_basicvirus_fit <- function(U = 1e6, I = 0, V = 1, n = 0, dU = 0, dI = 2
   allpars = c(Y0,modelpars,tfinal = max(fitdata$xvals))
 
   #doe one final run of the ODE to get a time-series to report back
-  odeout <- do.call(simulate_basicvirus_ode, as.list(allpars))
+  odeout <- do.call(simulate_Basic_Virus_Model_ode, as.list(allpars))
   simres = odeout$ts
   #extract values for virus load at time points where data is available
   modelpred = simres[match(fitdata$xvals,simres[,"time"]),"V"];

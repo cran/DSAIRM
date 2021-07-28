@@ -30,8 +30,8 @@
 #'
 #' @return A ggplot plot structure for display in a Shiny UI.
 #' @details This function can be called to produce plots, i.e. those displayed for each app.
-#' The input needed by this function is produced by either calling the run_model() function (as done when going through the UI)
-#' or manually transforming the output from a simulate_ function into the correct list structure explained below.
+#' The input needed by this function is produced by either calling the \code{\link{run_model}} function (as done when going through the UI)
+#' or manually transforming the output from a simulate_ function into the correct list structure as explained here.
 #' @rawNamespace import(ggplot2, except = last_plot)
 #' @importFrom stats reshape
 #' @importFrom gridExtra grid.arrange
@@ -71,10 +71,11 @@ generate_ggplot <- function(res)
         rawdat = resnow$dat
       }
 
-      plottype <- if(is.null(resnow$plottype)) {'Lineplot'} else  {resnow$plottype} #if nothing is provided, we assume a line plot. That could lead to silly plots.
+      #if nothing is provided, we assume a line plot. That could lead to silly plots.
+      plottype <- if(is.null(resnow$plottype)) {'Lineplot'} else  {resnow$plottype}
 
       #if the first column is called 'Time' (as returned from several of the simulators)
-      #rename to xvals for consistency and so the code below will work
+      #rename to xvals for consistency so the code below will work
       if ( colnames(rawdat)[1] == 'Time' | colnames(rawdat)[1] == 'time' ) {colnames(rawdat)[1] <- 'xvals'}
 
       #for the plotting below, the data need to be in the form xvals/yvals/varnames
@@ -135,21 +136,21 @@ generate_ggplot <- function(res)
       ###choose between different types of plots
       if (plottype == 'Scatterplot')
       {
-        p2 = p1 + ggplot2::geom_point(data = dat, aes( y = .data$yvals, color = .data$varnames, shape = .data$varnames), size = linesize, na.rm=TRUE)
+        p2 = p1 + ggplot2::geom_point(data = dat, aes(y = .data$yvals, color = factor(.data$varnames, ordered = FALSE), shape = factor(.data$varnames, ordered = FALSE)), size = linesize, na.rm=TRUE)
       }
       if (plottype == 'Boxplot')
       {
-        p2 = p1 + ggplot2::geom_boxplot(data = dat, aes( y = .data$yvals, color = .data$varnames), size = linesize, na.rm=TRUE)
+        p2 = p1 + ggplot2::geom_boxplot(data = dat, aes( y = .data$yvals, color = as.factor(.data$varnames)), size = linesize, na.rm=TRUE)
       }
       if (plottype == 'Lineplot')
       {
-        p2 = p1 + ggplot2::geom_line(data = dat, aes( y = .data$yvals, color = .data$varnames, linetype = .data$varnames), size = linesize, na.rm=TRUE)
+        p2 = p1 + ggplot2::geom_line(data = dat, aes( y = .data$yvals, color = as.factor(.data$varnames), linetype = as.factor(.data$varnames)), size = linesize, na.rm=TRUE)
       }
       if (plottype == 'Mixedplot')
       {
         #a mix of lines and points. for this, the dataframe needs to contain an extra column indicating line or point
-        p1a = p1 + ggplot2::geom_line(data = dplyr::filter(dat,style == 'line'), aes( y = .data$yvals, color = .data$varnames, linetype = .data$varnames), size = linesize)
-        p2 = p1a + ggplot2::geom_point(data = dplyr::filter(dat,style == 'point'), aes( y = .data$yvals, color = .data$varnames, shape = .data$varnames), size = 2.5*linesize)
+        p1a = p1 + ggplot2::geom_line(data = dplyr::filter(dat,style == 'line'), aes( y = .data$yvals, color = as.factor(.data$varnames), linetype = as.factor(.data$varnames)), size = linesize)
+        p2 = p1a + ggplot2::geom_point(data = dplyr::filter(dat,style == 'point'), aes( y = .data$yvals, color = as.factor(.data$varnames), shape = factor(.data$varnames, ordered = FALSE)), size = 2.5*linesize)
       }
 
 
@@ -218,8 +219,8 @@ generate_ggplot <- function(res)
           p5b = p5a + ggplot2::theme(legend.position = legendlocation) #default is top
           p5c = p5b + ggplot2::theme(legend.key.width = grid::unit(3, "line")) #line thickness
           p5d = p5c + ggplot2::scale_colour_manual(name = legendtitle, values=plotpalette[1:(nlines+npoints)]) #color for each variable
-          p5e = p5d + ggplot2::scale_linetype_discrete(name = legendtitle, guide = FALSE) #symbol type for symbols; here is some trickery to make the legend look combined (turn off legend title/name)
-          pfinal = p5e + ggplot2::scale_shape_discrete(name = "", guide = FALSE) #symbol type for symbols
+          p5e = p5d + ggplot2::scale_linetype_discrete(name = legendtitle, guide = "none") #symbol type for symbols; here is some trickery to make the legend look combined (turn off legend title/name)
+          pfinal = p5e + ggplot2::scale_shape_discrete(name = "", guide = "none") #symbol type for symbols
         }
       } #end doing legend
       else
@@ -243,9 +244,8 @@ generate_ggplot <- function(res)
     if (nplots>1)
     {
       #number of columns needs to be stored in 1st list element
-      #browser()
       resultplot <- gridExtra::grid.arrange(grobs = allplots, ncol = res[[1]]$ncols)
-      #resultplot <- gridExtra::arrangeGrob(grobs = allplots, ncol = res[[1]]$ncol)
+      #resultplot <- gridExtra::arrangeGrob(grobs = allplots, ncol = res[[1]]$ncols)
       #cowplot::plot_grid(plotlist = allplots, ncol = res[[1]]$ncol)
 
     }
