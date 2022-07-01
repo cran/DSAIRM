@@ -93,42 +93,8 @@ server <- function(input, output, session)
 
 
   #######################################################
-  #start code that listens to the "download code" button
-  #not currently implemented/activated
-  #######################################################
-  output$download_code <- downloadHandler(
-    filename = function() {
-      "output.R"
-    },
-    content = function(file) {
-      #extract current model settings from UI input elements
-      x1=reactiveValuesToList(input, all.names=TRUE) #get all shiny inputs
-      #x1=as.list( c(g = 1, U = 100)) #get all shiny inputs
-      x2 = x1[! (names(x1) %in% appNames)] #remove inputs that are action buttons for apps
-      x3 = (x2[! (names(x2) %in% c('submitBtn','Exit') ) ]) #remove further inputs
-      modelsettings <- x3[!grepl("*selectized$", names(x3))] #remove any input with selectized
-      modelsettings <- c(modelsettings, appsettings)
-      modelfunction = modelsettings$simfunction
-      if (is.null(modelsettings$nreps)) {modelsettings$nreps <- 1} #if there is no UI input for replicates, assume reps is 1
-      #if no random seed is set in UI, set it to 123.
-      if (is.null(modelsettings$rngseed)) {modelsettings$rngseed <- 123}
-
-      # output <- paste(modelsettings, modelfunction)
-      # writeLines(output, file)
-
-      output <- download_code(modelsettings, modelfunction)
-
-      writeLines(output, file)
-    }
-    ,
-    contentType= "application/zip"
-  )
-  #######################################################
-  #end code that listens to the "download code" button
-  #######################################################
-
-  #######################################################
-  #code that allows download of all files
+  #code that allows download of all simulation files
+  #is triggered when user clicks on "download R code" button on main screen
   output$modeldownload <- downloadHandler(
     filename <- function() {
       "simulatorfunctions.zip"
@@ -246,7 +212,6 @@ server <- function(input, output, session)
                                                       otherinputs = appsettings$otherinputs, packagename = packagename)
                    output$modelinputs <- renderUI({modelinputs})
 
-
                    #display all inputs and outputs on the analyze tab
                    output$analyzemodel <- renderUI({
                      tagList(
@@ -300,21 +265,20 @@ server <- function(input, output, session)
                      output$ggplot <- NULL
                      output$plotly <- NULL
                      output$text <- NULL
-                     #extract current model settings from UI input elements
-                     x1=isolate(reactiveValuesToList(input)) #get all shiny inputs
-                     x2 = x1[! (names(x1) %in% appNames)] #remove inputs that are action buttons for apps
-                     x3 = (x2[! (names(x2) %in% c('submitBtn','Exit') ) ]) #remove further inputs
-                     #modelsettings = x3[!grepl("*selectized$", names(x3))] #remove any input with selectized
-                     modelsettings = x3
-                     #remove nested list of shiny input tags
-                     appsettings$otherinputs <- NULL
-                     #add settings information from appsettings list
-                     modelsettings = c(appsettings, modelsettings)
-                     if (is.null(modelsettings$nreps)) {modelsettings$nreps <- 1} #if there is no UI input for replicates, assume reps is 1
-                     #if no random seed is set in UI, set it to 123.
-                     if (is.null(modelsettings$rngseed)) {modelsettings$rngseed <- 123}
+
+                     #isolate UI inputs to make them non-reactive
+                     app_input <- isolate(reactiveValuesToList(input))
+
+                     # this function parses the inputs and app settings
+                     # to generate a list of model settings
+                     # these specify the settings for which a simulation should be run
+                     modelsettings <- generate_modelsettings(app_input, appsettings, appNames)
+
+
                      #run model, process inside run_model function based on settings
                      result <- run_model(modelsettings)
+
+
                      #if things worked, result contains a list structure for processing with the plot and text functions
                      #if things failed, result contains a string with an error message
                      if (is.character(result))
@@ -339,8 +303,9 @@ server <- function(input, output, session)
                        output$text <- renderText({ generate_text(result) })
                      }
                    }) #end with-progress wrapper
+
     } #end the expression being evaluated by observeevent
-    ) #end observe-event for analyze model submit button
+    ) #end observe-event for run model button
 
     #######################################################
     #end code that listens to the 'run simulation' button and runs a model for the specified settings
@@ -388,11 +353,19 @@ ui <- fluidPage(
   tags$div(id = "infotext", "More information can be found", a("on the package website.",  href="https://ahgroup.github.io/DSAIRM/", target="_blank")),
   navbarPage(title = packagename, id = packagename, selected = 'Menu',
              tabPanel(title = "Menu",
-                      tags$div(class='mainsectionheader', 'The Basics'),
+                      tags$div(class='mainsectionheader', 'Basic Virus Models'),
+                      fluidRow(
+                        make_button(at,"basicvirus"),
+                        make_button(at,"acutevirusir"),
+                        make_button(at,"chronicvirusir"),
+                        make_button(at,"virusandir"),
+                        class = "mainmenurow"
+                      ), #close fluidRow structure for input
+                      tags$div(id = "shinyheadertext", "IR = Immune Response"),
+                      tags$div(class='mainsectionheader', 'Basic Bacteria Models'),
                       fluidRow(
                         make_button(at,"basicbacteria"),
-                        make_button(at,"basicvirus"),
-                        make_button(at,"virusandir"),
+                        make_button(at,"extendedbacteria"),
                         class = "mainmenurow"
                       ), #close fluidRow structure for input
 
@@ -418,6 +391,7 @@ ui <- fluidPage(
                         make_button(at,"fitconfint"),
                         make_button(at,"fitmodelcomparison"),
                         make_button(at,"fitfludrug"),
+                        make_button(at,"fitbacteria"),
                         class = "mainmenurow"
                       ), #close fluidRow structure for input
 

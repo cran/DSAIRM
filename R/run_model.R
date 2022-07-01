@@ -27,33 +27,10 @@
 
 run_model <- function(modelsettings) {
 
-  #check if a simresult function ran ok
-  #if error occurs we exit run_model function
-  check_results <- function(simresult)
-  {
-    checkres = NULL
-    if (class(simresult)!="list") #if the return from the simulator function is not a list, something went wrong
-    {
-      checkres <- 'Model run failed. Maybe unreasonable parameter values?'
-      return(checkres)
-    }
-    #if simeresult is a list, check that no values in time-series are NaN or NA or Inf
-    if (!is.null(simresult$ts))
-    {
-      if (   (sum(is.nan(unlist(simresult$ts)))>0) || (sum(is.na(unlist(simresult$ts)))>0) || (sum(is.infinite(unlist(simresult$ts)))>0) )
-      {
-        checkres <- 'Model run failed. Maybe unreasonable parameter values?'
-        return(checkres)
-      }
-    }
-    return(checkres)
-  }
-
 
   #check to make sure inputs to function provide information needed for code to run
   if (is.null(modelsettings$simfunction)) { return("List element simfunction must be provided.") }
   if (is.null(modelsettings$modeltype)) { return("List element modeltype must be provided.") }
-
 
 
   #if the user sets the model type, apply that choice
@@ -96,7 +73,7 @@ run_model <- function(modelsettings) {
       #wrap in try command to catch errors
       #send result from simulator to a check function. If that function does not return null, exit run_model with error message
       simresult = try(eval(fctcall))
-      checkres <- check_results(simresult)
+      checkres <- check_simresults(simresult)
       if (!is.null(checkres)) {return(checkres)}
 
       #data for plots and text
@@ -148,7 +125,7 @@ run_model <- function(modelsettings) {
     }
     #run model
     simresult = try(eval(fctcall))
-    checkres <- check_results(simresult)
+    checkres <- check_simresults(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
     simresult <- simresult$ts
@@ -187,7 +164,7 @@ run_model <- function(modelsettings) {
     #send result from simulator to a check function. If that function does not return null, exit run_model with error message
     simresult = try(eval(fctcall))
 
-    checkres <- check_results(simresult)
+    checkres <- check_simresults(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
     simresult <- simresult$ts
@@ -285,7 +262,7 @@ run_model <- function(modelsettings) {
     simresult = try(eval(fctcall))
 
 
-    checkres <- check_results(simresult)
+    checkres <- check_simresults(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
     #pull the indicator for non-steady state out of the dataframe, process separately
@@ -361,7 +338,7 @@ run_model <- function(modelsettings) {
     #send result from simulator to a check function. If that function does not return null, exit run_model with error message
     simresult = try(eval(fctcall))
 
-    checkres <- check_results(simresult)
+    checkres <- check_simresults(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
 
@@ -401,7 +378,7 @@ run_model <- function(modelsettings) {
     ####################################################
     #different choices for text display for different fit models
     #both DSAIDE and DSAIRM models
-    if (grepl('flu_fit',simfunction) || grepl('basicvirus_fit',simfunction))
+    if (grepl('flu_fit',simfunction) || grepl('basicvirus_fit',simfunction) || grepl('bacteria_fit',simfunction))
     {
       txt1 <- paste('Best fit values for parameters',paste(names(simresult$bestpars), collapse = '/'), ' are ', paste(format(simresult$bestpars,  digits =2, nsmall = 2), collapse = '/' ))
       txt2 <- paste('Final SSR is ', format(simresult$SSR, digits =2, nsmall = 2))
@@ -447,7 +424,7 @@ run_model <- function(modelsettings) {
     #send result from simulator to a check function. If that function does not return null, exit run_model with error message
     simresult = try(eval(fctcall))
 
-    checkres <- check_results(simresult)
+    checkres <- check_simresults(simresult)
     if (!is.null(checkres)) {return(checkres)}
 
     steady = simresult$dat$steady
