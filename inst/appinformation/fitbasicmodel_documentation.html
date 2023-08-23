@@ -29,13 +29,13 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
@@ -43,25 +43,25 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
 <style type="text/css">
-/* for pandoc --citeproc since 2.11 */
+
 div.csl-bib-body { }
 div.csl-entry {
-  clear: both;
+clear: both;
 }
 .hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+margin-left:2em;
+text-indent:-2em;
 }
 div.csl-left-margin {
-  min-width:2em;
-  float:left;
+min-width:2em;
+float:left;
 }
 div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
+margin-left:2em;
+padding-left:1em;
 }
 div.csl-indent {
-  margin-left: 2em;
+margin-left: 2em;
 }
 </style>
 
@@ -184,12 +184,14 @@ files for the <code>nloptr</code> package and especially the <a href="https://nl
 <div id="notes" class="section level3">
 <h3>Notes</h3>
 <ul>
-<li><p>For this dataset, there is a lower limit of detection (LOD) for
-the virus load. To account for this, if the data is at the LOD, we set
-any model prediction which is below the LOD to the LOD. This means we do
-not penalize the model if it predicts virus load to be at the LOD or any
-lower value. This is done before computing the SSR using the equation
-above.</p></li>
+<li><p>For this dataset, there is a lower limit of detection (LOD, also
+sometimes called limit of quantification LQD) for the virus load. To
+account for this, if the data is at the LOD, we set any model prediction
+which is below the LOD to the LOD. This means we do not penalize the
+model if it predicts virus load to be at the LOD or any lower value.
+This is done before computing the SSR using the equation above. This
+approach to treating the values below LOD is alos implemented in all the
+other fitting apps.</p></li>
 <li><p>While minimizing the sum of square difference between data and
 model prediction is a very common approach, it is not the only one. A
 more flexible formulation of the problem is to define a likelihood
@@ -577,7 +579,7 @@ Biology</em> 3 (12): e240. <a href="https://doi.org/10.1371/journal.pcbi.0030240
 <div id="ref-hayden96" class="csl-entry">
 Hayden, F G, J J Treanor, R F Betts, M Lobo, J D Esinhart, and E K
 Hussey. 1996. <span>“<a href="https://www.ncbi.nlm.nih.gov/pubmed/8544269">Safety and Efficacy
-of the Neuraminidase Inhibitor <span>Gg167</span> in Experimental Human
+of the Neuraminidase Inhibitor <span>GG167</span> in Experimental Human
 Influenza.</a>”</span> <em>JAMA</em> 275 (4): 295–99.
 </div>
 <div id="ref-hilborn97" class="csl-entry">

@@ -14,7 +14,10 @@
 #' on the package website:
 #' https://ahgroup.github.io/DSAIRM/
 #'
-#'
-#' @docType package
-#' @name DSAIRM
+
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
 NULL

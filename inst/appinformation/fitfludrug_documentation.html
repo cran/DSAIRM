@@ -29,13 +29,13 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
@@ -43,25 +43,25 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
 <style type="text/css">
-/* for pandoc --citeproc since 2.11 */
+
 div.csl-bib-body { }
 div.csl-entry {
-  clear: both;
+clear: both;
 }
 .hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+margin-left:2em;
+text-indent:-2em;
 }
 div.csl-left-margin {
-  min-width:2em;
-  float:left;
+min-width:2em;
+float:left;
 }
 div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
+margin-left:2em;
+padding-left:1em;
 }
 div.csl-indent {
-  margin-left: 2em;
+margin-left: 2em;
 }
 </style>
 
@@ -218,10 +218,10 @@ conversion factor to <em>g=0</em>. Set upper and lower bounds for each
 of these parameters to 0 and 100. For a discussion on parameter bounds,
 see some of the other fitting apps. The bounds for the treatment
 strength are hard coded to be 0 and 1.</p>
-<p>Start with the drug turned off. Run 1 iteration of model 1. I suggest
-you choose a log scale for the y-axis and plotly as the plot engine.
-Using plotly allows you to click on the rather busy figure and turn
-on/off specific model components. You should see all 3 curves (no
+<p>Start with the drug turned off (k=0). Run 1 iteration of model 1. I
+suggest you choose a log scale for the y-axis and plotly as the plot
+engine. Using plotly allows you to click on the rather busy figure and
+turn on/off specific model components. You should see all 3 curves (no
 treatment, early treatment, late treatment) on top of each other and an
 SSR of around 39.</p>
 <p>Now set drug efficacy to 1, run model 1 for 1 iteration, and then
@@ -236,10 +236,14 @@ little while. SSR will have decreased to a bit over 4. Take a look at
 the numbers below the plot. Those are the estimated values for the
 parameters at the final iteration of the model (this might or might not
 be the overall best fit, we’ll get back to this). For now, focus on the
-value for drug efficacy (<em>f</em> for model 1). You should find it to
-be 1, i.e. a perfect drug. Next, fit model 2 for 500 iterations. You’ll
-find that it performs slightly better than model 1, and the best fit
-estimate for the drug efficacy is again 1.</p>
+value for drug efficacy (<em>f</em> for model 1). Remember that for the
+input, you set drug efficacy with the parameter <em>k</em>, which then
+is mapped to either <em>f</em> or <em>e</em> based on the model.
+Therefore you will see the best reported for either <em>f</em> or
+<em>e</em>, based on the model you run. You should find it to be 1,
+i.e. a perfect drug. Next, fit model 2 for 500 iterations. You’ll find
+that it performs slightly better than model 1, and the best fit estimate
+for the drug efficacy is again 1.</p>
 <p>If your computer is fast enough, you can increase to 1000 or more
 iterations for both models. Results should not change. Based on this, we
 might conclude that the mechanism of the drug preventing virus
@@ -366,7 +370,7 @@ Biology</em> 3 (12): e240. <a href="https://doi.org/10.1371/journal.pcbi.0030240
 <div id="ref-hayden96" class="csl-entry">
 Hayden, F G, J J Treanor, R F Betts, M Lobo, J D Esinhart, and E K
 Hussey. 1996. <span>“<a href="https://www.ncbi.nlm.nih.gov/pubmed/8544269">Safety and Efficacy
-of the Neuraminidase Inhibitor <span>Gg167</span> in Experimental Human
+of the Neuraminidase Inhibitor <span>GG167</span> in Experimental Human
 Influenza.</a>”</span> <em>JAMA</em> 275 (4): 295–99.
 </div>
 </div>
